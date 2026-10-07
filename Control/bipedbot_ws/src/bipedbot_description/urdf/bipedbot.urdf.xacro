@@ -1,0 +1,336 @@
+<?xml version="1.0" ?>
+<robot name="Biped_bot_1" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<link name="base_footprint"/>
+<link name="base_link">
+  <inertial>
+    <origin xyz="3.180981950978574e-05 0.0018828231312234408 0.20026420610273285" rpy="0 0 0"/>
+    <mass value="0.6871364009577915"/>
+    <inertia ixx="0.001278" iyy="0.000754" izz="0.001226" ixy="0.0" iyz="-9e-06" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="right_top_leg_1">
+  <inertial>
+    <origin xyz="0.008146638140999245 -0.0344919738468972 -0.024151554062895847" rpy="0 0 0"/>
+    <mass value="0.11765454158339926"/>
+    <inertia ixx="0.000238" iyy="9.2e-05" izz="0.000152" ixy="5e-06" iyz="-8.2e-05" ixz="4e-06"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.04 0.01 -0.199931" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_top_leg_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="-0.04 0.01 -0.199931" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_top_leg_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="right_bottom_leg_1">
+  <inertial>
+    <origin xyz="-0.0049999999999989775 0.03342953324706922 -0.04524843328414291" rpy="0 0 0"/>
+    <mass value="0.06694057104242657"/>
+    <inertia ixx="0.000154" iyy="9.6e-05" izz="5.9e-05" ixy="0.0" iyz="6e-05" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.04 0.089867 -0.144007" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_bottom_leg_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="-0.04 0.089867 -0.144007" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_bottom_leg_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="left_top_leg_1">
+  <inertial>
+    <origin xyz="-0.008170600100975561 -0.03442394876428098 -0.024103922387621074" rpy="0 0 0"/>
+    <mass value="0.11806434962739475"/>
+    <inertia ixx="0.000239" iyy="9.3e-05" izz="0.000153" ixy="-5e-06" iyz="-8.3e-05" ixz="-4e-06"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.04 0.01 -0.199931" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_top_leg_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="0.04 0.01 -0.199931" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_top_leg_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="left_bottom_leg_1">
+  <inertial>
+    <origin xyz="0.004999999999999165 0.0334295332470692 -0.04524843328414298" rpy="0 0 0"/>
+    <mass value="0.06694057104242657"/>
+    <inertia ixx="0.000154" iyy="9.6e-05" izz="5.9e-05" ixy="-0.0" iyz="6e-05" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.04 0.089867 -0.144007" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_bottom_leg_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="0.04 0.089867 -0.144007" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_bottom_leg_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="right_motor_1">
+  <inertial>
+    <origin xyz="0.002611940298508038 -3.875925415914444e-07 -4.822695428494117e-07" rpy="0 0 0"/>
+    <mass value="0.022590485913617148"/>
+    <inertia ixx="3e-06" iyy="3e-06" izz="3e-06" ixy="0.0" iyz="-0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.035 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_motor_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="-0.035 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_motor_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="left_motor_1">
+  <inertial>
+    <origin xyz="-0.002611940298508253 -3.875925402695851e-07 -4.822695418571499e-07" rpy="0 0 0"/>
+    <mass value="0.022590485913617148"/>
+    <inertia ixx="3e-06" iyy="3e-06" izz="3e-06" ixy="0.0" iyz="-0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.035 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_motor_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="0.035 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_motor_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="left_wheel_1">
+  <inertial>
+    <origin xyz="-3.5058995290215833e-10 -4.003821121052048e-07 -4.778944649383443e-07" rpy="0 0 0"/>
+    <mass value="0.02988168724907574"/>
+    <inertia ixx="2.1e-05" iyy="1.1e-05" izz="1.1e-05" ixy="0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.06 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="0.06 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="right_wheel_1">
+  <inertial>
+    <origin xyz="-3.5058860675674097e-10 -4.003821121121437e-07 -4.778944651673278e-07" rpy="0 0 0"/>
+    <mass value="0.02988168724907574"/>
+    <inertia ixx="2.1e-05" iyy="1.1e-05" izz="1.1e-05" ixy="0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.06 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="-0.06 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="imu_link_1">
+  <inertial>
+    <origin xyz="-0.00800314775699511 0.005842843639794027 0.0010391859500072376" rpy="0 0 0"/>
+    <mass value="0.0006222857790364956"/>
+    <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="0.0" iyz="-0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.008 0.0055 -0.215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/imu_link_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="-0.008 0.0055 -0.215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/imu_link_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="left_tyre_1">
+  <inertial>
+    <origin xyz="1.8586576635053198e-05 -3.879422003933569e-07 -4.817137699564267e-07" rpy="0 0 0"/>
+    <mass value="0.02747331301180858"/>
+    <inertia ixx="3.3e-05" iyy="1.8e-05" izz="1.8e-05" ixy="0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.06 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_tyre_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="0.06 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/left_tyre_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="right_tyre_1">
+  <inertial>
+    <origin xyz="1.85865766363022e-05 -3.8794220039682636e-07 -4.817137701784713e-07" rpy="0 0 0"/>
+    <mass value="0.02747331301180858"/>
+    <inertia ixx="3.3e-05" iyy="1.8e-05" izz="1.8e-05" ixy="0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.06 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_tyre_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    
+  </visual>
+  <collision>
+    <origin xyz="-0.06 0.015302 -0.037518" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://bipedbot_description/meshes/right_tyre_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<joint name="base_joint" type="fixed">
+  <parent link="base_footprint"/>
+  <child link="base_link" />
+  <origin xyz="0 0 0.033" rpy="0 0 0"/>
+
+</joint>
+
+<joint name="right_top_leg_joint" type="fixed">
+  <origin xyz="0.04 -0.01 0.199931" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="right_top_leg_1"/>
+  <axis xyz="-1.0 0.0 0.0"/>
+</joint>
+
+<joint name="right_bottom_leg_joint" type="fixed">
+  <origin xyz="0.0 -0.079867 -0.055924" rpy="0 0 0"/>
+  <parent link="right_top_leg_1"/>
+  <child link="right_bottom_leg_1"/>
+  <axis xyz="1.0 0.0 -0.0"/>
+</joint>
+
+<joint name="left_top_leg_joint" type="fixed">
+  <origin xyz="-0.04 -0.01 0.199931" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="left_top_leg_1"/>
+  <axis xyz="-1.0 0.0 0.0"/>
+</joint>
+
+<joint name="left_bottom_leg_joint" type="fixed">
+  <origin xyz="0.0 -0.079867 -0.055924" rpy="0 0 0"/>
+  <parent link="left_top_leg_1"/>
+  <child link="left_bottom_leg_1"/>
+  <axis xyz="-1.0 0.0 -0.0"/>
+</joint>
+
+<joint name="right_motor_joint" type="fixed">
+  <origin xyz="-0.005 0.074565 -0.106489" rpy="0 0 0"/>
+  <parent link="right_bottom_leg_1"/>
+  <child link="right_motor_1"/>
+</joint>
+
+<joint name="left_motor_joint" type="fixed">
+  <origin xyz="0.005 0.074565 -0.106489" rpy="0 0 0"/>
+  <parent link="left_bottom_leg_1"/>
+  <child link="left_motor_1"/>
+</joint>
+
+<joint name="left_wheel_joint" type="continuous">
+  <origin xyz="-0.025 0.0 0.0" rpy="0 0 0"/>
+  <parent link="left_motor_1"/>
+  <child link="left_wheel_1"/>
+  <axis xyz="-1.0 -0.0 -0.0"/>
+</joint>
+
+<joint name="right_wheel_joint" type="continuous">
+  <origin xyz="0.025 0.0 0.0" rpy="0 0 0"/>
+  <parent link="right_motor_1"/>
+  <child link="right_wheel_1"/>
+  <axis xyz="1.0 0.0 -0.0"/>
+</joint>
+
+<joint name="imu_joint" type="fixed">
+  <origin xyz="0.008 -0.0055 0.215" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="imu_link_1"/>
+</joint>
+
+<joint name="left_tyre_joint" type="fixed">
+  <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  <parent link="left_wheel_1"/>
+  <child link="left_tyre_1"/>
+</joint>
+
+<joint name="right_tyre_joint" type="fixed">
+  <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  <parent link="right_wheel_1"/>
+  <child link="right_tyre_1"/>
+</joint>
+
+</robot>
