@@ -1,12 +1,16 @@
 <?xml version="1.0" ?>
 <robot name="Biped_bot_1" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+<xacro:arg name="is_ignition" default="true"/>
+
 <!-- Load Simulated or Real Hardware Interfaces -->
 <xacro:arg name="is_sim" default="true"/>
 
 <!-- Include Gazebo Parameters -->
 <xacro:include filename="$(find bipedbot_description)/urdf/bipedbot_gazebo.xacro" />
 
+<!-- Include ros2_control Plugins -->
+<xacro:include filename="$(find bipedbot_description)/urdf/bipedbot_ros2_control.xacro" />
 
 <!-- Greyish-black material for all visuals -->
 <material name="grey_black">

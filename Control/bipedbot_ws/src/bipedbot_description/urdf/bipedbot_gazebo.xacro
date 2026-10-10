@@ -2,7 +2,6 @@
 
 <robot name="bipedbot" xmlns:xacro="http://ros.org/wiki/xacro">
 
-
     <!-- Wheels -->
     <gazebo reference="left_tyre_1">
         <mu1>1.0</mu1>
@@ -18,6 +17,51 @@
         <kp>100000.0</kp>
         <kd>10.0</kd>
         <minDepth>0.001</minDepth>
+    </gazebo>
+
+    <!-- ROS 2 Control + IMU system plugins -->
+    <gazebo>
+        <!-- ROS 2 Humble (Gazebo Fortress / Ignition) -->
+        <xacro:if value="$(arg is_ignition)">
+            <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+                <parameters>$(find bipedbot_controller)/config/bipedbot_controllers.yaml</parameters>
+            </plugin>
+            <plugin filename="ignition-gazebo-imu-system" name="ignition::gazebo::systems::Imu"/>
+        </xacro:if>
+        <!-- ROS 2 Iron or above (Gazebo Harmonic) -->
+        <xacro:unless value="$(arg is_ignition)">
+            <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+                <parameters>$(find bipedbot_controller)/config/bipedbot_controllers.yaml</parameters>
+            </plugin>
+            <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+        </xacro:unless>
+    </gazebo>
+
+    <!-- IMU -->
+    <gazebo reference="imu_link_1">
+        <sensor name="imu" type="imu">
+            <always_on>true</always_on>
+            <update_rate>100</update_rate>
+            <xacro:if value="$(arg is_ignition)">
+                <ignition_frame_id>imu_link_1</ignition_frame_id>
+            </xacro:if>
+            <xacro:unless value="$(arg is_ignition)">
+                <gz_frame_id>imu_link_1</gz_frame_id>
+            </xacro:unless>
+            <topic>imu</topic>
+            <imu>
+                <angular_velocity>
+                    <x><noise type="gaussian"><mean>0.0</mean><stddev>2e-4</stddev></noise></x>
+                    <y><noise type="gaussian"><mean>0.0</mean><stddev>2e-4</stddev></noise></y>
+                    <z><noise type="gaussian"><mean>0.0</mean><stddev>2e-4</stddev></noise></z>
+                </angular_velocity>
+                <linear_acceleration>
+                    <x><noise type="gaussian"><mean>0.0</mean><stddev>1.7e-2</stddev></noise></x>
+                    <y><noise type="gaussian"><mean>0.0</mean><stddev>1.7e-2</stddev></noise></y>
+                    <z><noise type="gaussian"><mean>0.0</mean><stddev>1.7e-2</stddev></noise></z>
+                </linear_acceleration>
+            </imu>
+        </sensor>
     </gazebo>
 
 </robot>
