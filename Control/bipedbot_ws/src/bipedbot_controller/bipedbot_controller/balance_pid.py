@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Balancing node, stage 1: PID on tilt angle, output sent directly as the wheel
-velocity command.
+Balancing node, stage 2: PID output is wheel ACCELERATION, integrated into the
+wheel speed command (the wheels take a velocity command).
 
-Debug (/balance/debug): [angle, setpoint, error, output]
+Debug (/balance/debug): [angle, setpoint, error, wheel_speed, pid_accel]
 """
 import math
 
@@ -38,15 +38,17 @@ class BalancePID(Node):
         self.declare_parameter("tilt_axis", "roll")
         self.declare_parameter("angle_sign", 1.0)
         self.declare_parameter("setpoint", -0.03)
-        self.declare_parameter("kp", 60.0)             # rad/s per rad
+        self.declare_parameter("kp", 400.0)            # rad/s^2 per rad
         self.declare_parameter("ki", 0.0)
-        self.declare_parameter("kd", 3.0)              # rad/s per rad/s
+        self.declare_parameter("kd", 20.0)             # rad/s^2 per rad/s
         self.declare_parameter("i_limit", 1.0)
         self.declare_parameter("output_limit", 20.0)   # rad/s, wheel speed clamp
         self.declare_parameter("fall_angle", 0.7)
         self.declare_parameter("enabled", True)
+        self.declare_parameter("integrate_output", True)
 
         self.integral = 0.0
+        self.speed = 0.0
         self.last_stamp = None
 
         imu_topic = self.get_parameter("imu_topic").value
@@ -100,22 +102,28 @@ class BalancePID(Node):
 
         if not self.p("enabled") or abs(error) > self.p("fall_angle"):
             self.integral = 0.0
+            self.speed = 0.0
             self.publish_cmd(0.0)
-            self.publish_debug(angle, error, 0.0)
+            self.publish_debug(angle, error, 0.0, 0.0)
             return
 
         i_lim = self.p("i_limit")
         self.integral = clamp(self.integral + error * dt, -i_lim, i_lim)
         pid = self.p("kp") * error + self.p("ki") * self.integral + self.p("kd") * rate
 
-        u = clamp(pid, -self.p("output_limit"), self.p("output_limit"))
+        limit = self.p("output_limit")
+        if self.p("integrate_output"):
+            self.speed = clamp(self.speed + pid * dt, -limit, limit)  # clamp = anti-windup
+            u = self.speed
+        else:
+            u = clamp(pid, -limit, limit)
 
         self.publish_cmd(u)
-        self.publish_debug(angle, error, u)
+        self.publish_debug(angle, error, u, pid)
 
-    def publish_debug(self, angle, error, u):
+    def publish_debug(self, angle, error, u, pid):
         d = Float64MultiArray()
-        d.data = [angle, self.p("setpoint"), error, u]
+        d.data = [angle, self.p("setpoint"), error, u, pid]
         self.dbg_pub.publish(d)
 
 
