@@ -268,32 +268,38 @@
   <origin xyz="0 0 0" rpy="0 0 0"/>
 </joint>
 
-<joint name="right_top_leg_joint" type="fixed">
+<!-- Leg joints: planar hip/knee, axes parallel to the wheel axle (x). Limits cover a hip height
+     of about 0.09 .. 0.21 m (see analysis/leg_model.py); the controller restricts it further. -->
+<joint name="right_top_leg_joint" type="revolute">
   <origin xyz="0.04 -0.01 0.199931" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="right_top_leg_1"/>
   <axis xyz="-1.0 0.0 0.0"/>
+  <limit lower="-0.70" upper="0.70" effort="2.0" velocity="3.0"/>
 </joint>
 
-<joint name="right_bottom_leg_joint" type="fixed">
+<joint name="right_bottom_leg_joint" type="revolute">
   <origin xyz="0.0 -0.079867 -0.055924" rpy="0 0 0"/>
   <parent link="right_top_leg_1"/>
   <child link="right_bottom_leg_1"/>
   <axis xyz="1.0 0.0 -0.0"/>
+  <limit lower="-0.85" upper="0.85" effort="2.0" velocity="3.0"/>
 </joint>
 
-<joint name="left_top_leg_joint" type="fixed">
+<joint name="left_top_leg_joint" type="revolute">
   <origin xyz="-0.04 -0.01 0.199931" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="left_top_leg_1"/>
   <axis xyz="-1.0 0.0 0.0"/>
+  <limit lower="-0.70" upper="0.70" effort="2.0" velocity="3.0"/>
 </joint>
 
-<joint name="left_bottom_leg_joint" type="fixed">
+<joint name="left_bottom_leg_joint" type="revolute">
   <origin xyz="0.0 -0.079867 -0.055924" rpy="0 0 0"/>
   <parent link="left_top_leg_1"/>
   <child link="left_bottom_leg_1"/>
   <axis xyz="-1.0 0.0 -0.0"/>
+  <limit lower="-0.85" upper="0.85" effort="2.0" velocity="3.0"/>
 </joint>
 
 <joint name="right_motor_joint" type="fixed">
