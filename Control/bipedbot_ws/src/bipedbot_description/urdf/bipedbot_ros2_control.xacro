@@ -33,6 +33,52 @@
             <state_interface name="position"/>
             <state_interface name="velocity"/>
         </joint>
+
+        <!-- Leg joints, position-commanded. ign_ros2_control turns the position error into a
+             velocity command (gain position_proportional_gain). -->
+        <joint name="left_top_leg_joint">
+            <command_interface name="position">
+                <param name="min">-0.70</param>
+                <param name="max">0.70</param>
+            </command_interface>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="left_bottom_leg_joint">
+            <command_interface name="position">
+                <param name="min">-0.85</param>
+                <param name="max">0.85</param>
+            </command_interface>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="right_top_leg_joint">
+            <command_interface name="position">
+                <param name="min">-0.70</param>
+                <param name="max">0.70</param>
+            </command_interface>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="right_bottom_leg_joint">
+            <command_interface name="position">
+                <param name="min">-0.85</param>
+                <param name="max">0.85</param>
+            </command_interface>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+        </joint>
     </ros2_control>
 
 </robot>       

@@ -12,13 +12,15 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 install(
-  DIRECTORY config launch
+  DIRECTORY config launch analysis
   DESTINATION share/${PROJECT_NAME}
 )
 install(PROGRAMS
   ${PROJECT_NAME}/simple_controller.py
   ${PROJECT_NAME}/balance_pid.py
   ${PROJECT_NAME}/drive_forward.py
+  ${PROJECT_NAME}/leg_height_controller.py
+  ${PROJECT_NAME}/scenario_runner.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

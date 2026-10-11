@@ -27,6 +27,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu
 from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Float64
 
 
 def quat_to_roll_pitch(x, y, z, w):
@@ -90,6 +91,10 @@ class BalancePID(Node):
         self.w_cmd_f = 0.0      # NEW: slew-limited wheel-speed target [rad/s]
         self.last_cmd_t = None  # NEW: wall-clock time of the last command
 
+        # Leg Height Controller Parameters
+        self.declare_parameter("ff_gain", 1.0)
+        self.ff = 0.0
+
         imu_topic = self.get_parameter("imu_topic").value
         self.mode = self.get_parameter("output_mode").value
         out_topic = self.get_parameter("output_topic").value
@@ -97,6 +102,10 @@ class BalancePID(Node):
         self.create_subscription(Imu, imu_topic, self.imu_cb, 10)
         self.create_subscription(Twist, self.get_parameter("cmd_vel_topic").value,
                                  self.cmd_cb, 10)
+        
+        self.create_subscription(Float64, "/balance/setpoint_offset",
+                                 lambda m: setattr(self, "ff", m.data), 10)
+
         if self.mode == "twist":
             self.cmd_pub = self.create_publisher(Twist, out_topic, 10)
         else:
@@ -160,13 +169,15 @@ class BalancePID(Node):
         angle *= sign
         rate *= sign
 
-        base_error = angle - self.p("setpoint")
+        # Reference = nominal setpoint + feedforward from the leg height controller
+        ref = self.p("setpoint") + self.p("ff_gain") * self.ff
+        base_error = angle - ref
 
         # Fallen over or disabled: stop and reset
         if not self.p("enabled") or abs(base_error) > self.p("fall_angle"):
             self.reset()
             self.publish_cmd(0.0)
-            self.publish_debug(angle, self.p("setpoint"), base_error, 0.0, 0.0, 0.0)
+            self.publish_debug(angle, ref, base_error, 0.0, 0.0, 0.0)
             return
 
         integrate = self.p("integrate_output")
@@ -196,7 +207,7 @@ class BalancePID(Node):
             self.trim = clamp(self.trim - self.p("speed_ki") * speed_err * dt, -tl, tl)
             lean = clamp(self.trim - self.p("speed_kp") * speed_err, -tl, tl)
 
-        sp_eff = self.p("setpoint") + lean
+        sp_eff = ref + lean
         error = angle - sp_eff
 
         i_lim = self.p("i_limit")
