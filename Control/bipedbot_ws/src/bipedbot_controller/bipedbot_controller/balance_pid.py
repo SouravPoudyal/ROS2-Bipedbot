@@ -7,6 +7,11 @@ Publishes  : wheel command              (Float64MultiArray [left, right], or Twi
              /balance/debug             (Float64MultiArray:
                 [angle, effective_setpoint, error, wheel_speed, pid_accel, lean_offset])
 
+Drive      : geometry_msgs/Twist on /cmd_vel (linear.x = forward speed in m/s,
+             angular.z = yaw rate in rad/s). Forward speed is passed through the outer
+             loop (the robot leans to reach it); yaw is a differential on the two wheels.
+             Commands time out to zero. Only active when integrate_output is True.
+
 Inner loop : PID on tilt angle -> wheel ACCELERATION, integrated into the speed command
              (a plain PD on speed cannot stabilise an inverted pendulum).
 Outer loop : wheel speed shifts the lean target (speed_kp, speed_ki) so the robot does
@@ -15,6 +20,7 @@ Outer loop : wheel speed shifts the lean target (speed_kp, speed_ki) so the robo
 Gains are re-read every cycle:   ros2 param set /balance_pid kp 500.0
 """
 import math
+import time
 
 import rclpy
 from rclpy.node import Node
@@ -64,16 +70,33 @@ class BalancePID(Node):
         self.declare_parameter("speed_ki", 0.0005)     # rad of lean per rad/s per second
         self.declare_parameter("lean_limit", 0.2)      # rad, max total lean offset
 
+        # --- Driving (cmd_vel) --- NEW
+        self.declare_parameter("cmd_vel_topic", "/cmd_vel")
+        self.declare_parameter("max_speed", 0.3)        # m/s, clamp on linear.x
+        self.declare_parameter("max_yaw_rate", 1.0)     # rad/s, clamp on angular.z
+        self.declare_parameter("cmd_accel", 0.3)        # m/s^2, slew limit on the speed command
+        self.declare_parameter("cmd_timeout", 0.5)      # s, commands older than this count as zero
+        self.declare_parameter("forward_sign", -1.0)     # flip to -1.0 if +linear.x drives backwards
+        self.declare_parameter("yaw_sign", 1.0)         # flip to -1.0 if +angular.z turns the wrong way
+        self.declare_parameter("wheel_radius", 0.037)   # m
+        self.declare_parameter("wheel_separation", 0.12)  # m
+
         self.integral = 0.0
         self.speed = 0.0
         self.trim = 0.0
         self.last_stamp = None
+        self.v_cmd = 0.0        # NEW: latest commanded forward speed [m/s]
+        self.wz_cmd = 0.0       # NEW: latest commanded yaw rate [rad/s]
+        self.w_cmd_f = 0.0      # NEW: slew-limited wheel-speed target [rad/s]
+        self.last_cmd_t = None  # NEW: wall-clock time of the last command
 
         imu_topic = self.get_parameter("imu_topic").value
         self.mode = self.get_parameter("output_mode").value
         out_topic = self.get_parameter("output_topic").value
 
         self.create_subscription(Imu, imu_topic, self.imu_cb, 10)
+        self.create_subscription(Twist, self.get_parameter("cmd_vel_topic").value,
+                                 self.cmd_cb, 10)
         if self.mode == "twist":
             self.cmd_pub = self.create_publisher(Twist, out_topic, 10)
         else:
@@ -87,19 +110,31 @@ class BalancePID(Node):
     def p(self, name):
         return self.get_parameter(name).value
 
-    def publish_cmd(self, u):
+    def cmd_cb(self, msg: Twist):
+        vmax = self.p("max_speed")
+        wmax = self.p("max_yaw_rate")
+        self.v_cmd = clamp(msg.linear.x, -vmax, vmax)
+        self.wz_cmd = clamp(msg.angular.z, -wmax, wmax)
+        self.last_cmd_t = time.monotonic()
+
+    def publish_cmd(self, u, dlt=0.0):
         if self.mode == "twist":
             msg = Twist()
             msg.linear.x = u
         else:
+            lim = self.p("output_limit")
             msg = Float64MultiArray()
-            msg.data = [self.p("left_sign") * u, self.p("right_sign") * u]
+            msg.data = [
+                clamp(self.p("left_sign") * (u + dlt), -lim, lim),
+                clamp(self.p("right_sign") * (u - dlt), -lim, lim),
+            ]
         self.cmd_pub.publish(msg)
 
     def reset(self):
         self.integral = 0.0
         self.speed = 0.0
         self.trim = 0.0
+        self.w_cmd_f = 0.0
 
     def imu_cb(self, msg: Imu):
         stamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
@@ -136,13 +171,30 @@ class BalancePID(Node):
 
         integrate = self.p("integrate_output")
 
-        # Outer loop: wheel speed shifts the lean target.
-        # Negative speed -> raise the target, so the robot accelerates back toward zero.
+        # NEW: drive command. Commands that stop arriving count as zero.
+        r = self.p("wheel_radius")
+        if self.last_cmd_t is None or time.monotonic() - self.last_cmd_t > self.p("cmd_timeout"):
+            v_cmd, wz_cmd = 0.0, 0.0
+        else:
+            v_cmd, wz_cmd = self.v_cmd, self.wz_cmd
+        w_target = self.p("forward_sign") * v_cmd / r            # rad/s
+        if self.p("cmd_accel") > 0.0:
+            step = self.p("cmd_accel") / r * dt                  # slew limit per cycle
+            self.w_cmd_f += clamp(w_target - self.w_cmd_f, -step, step)
+        else:
+            self.w_cmd_f = w_target
+        if not integrate:
+            self.w_cmd_f = 0.0
+            wz_cmd = 0.0
+
+        # Outer loop: wheel speed (relative to the commanded speed) shifts the lean target.
+        # Speed below the command -> lean further forward, so the robot speeds up.
         lean = 0.0
         if integrate:
             tl = self.p("lean_limit")
-            self.trim = clamp(self.trim - self.p("speed_ki") * self.speed * dt, -tl, tl)
-            lean = clamp(self.trim - self.p("speed_kp") * self.speed, -tl, tl)
+            speed_err = self.speed - self.w_cmd_f
+            self.trim = clamp(self.trim - self.p("speed_ki") * speed_err * dt, -tl, tl)
+            lean = clamp(self.trim - self.p("speed_kp") * speed_err, -tl, tl)
 
         sp_eff = self.p("setpoint") + lean
         error = angle - sp_eff
@@ -159,12 +211,17 @@ class BalancePID(Node):
         else:
             u = clamp(pid, -limit, limit)
 
-        self.publish_cmd(u)
-        self.publish_debug(angle, sp_eff, error, u, pid, lean)
+        # NEW: yaw as a differential on the two physical wheel speeds
+        # (omega_z = -2 r delta / d, so delta = -d * omega_z / (2 r)).
+        dlt = self.p("yaw_sign") * (-self.p("wheel_separation") * wz_cmd / (2.0 * r))
 
-    def publish_debug(self, angle, sp_eff, error, u, pid, lean):
+        self.publish_cmd(u, dlt)
+        self.publish_debug(angle, sp_eff, error, u, pid, lean, self.w_cmd_f)
+
+    def publish_debug(self, angle, sp_eff, error, u, pid, lean, w_cmd=0.0):
         d = Float64MultiArray()
-        d.data = [angle, sp_eff, error, u, pid, lean]
+        # index 6 (w_cmd) is new; indices 0-5 are unchanged
+        d.data = [angle, sp_eff, error, u, pid, lean, w_cmd]
         self.dbg_pub.publish(d)
 
 

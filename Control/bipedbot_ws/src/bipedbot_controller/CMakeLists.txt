@@ -18,6 +18,7 @@ install(
 install(PROGRAMS
   ${PROJECT_NAME}/simple_controller.py
   ${PROJECT_NAME}/balance_pid.py
+  ${PROJECT_NAME}/drive_forward.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
