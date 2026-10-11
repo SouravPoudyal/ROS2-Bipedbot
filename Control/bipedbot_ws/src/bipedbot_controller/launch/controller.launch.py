@@ -26,6 +26,12 @@ def generate_launch_description():
         arguments=["simple_velocity_controller", "--controller-manager", "/controller_manager"],
     )
 
+    leg_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["leg_position_controller", "--controller-manager", "/controller_manager"],
+    )
+
     simple_controller = Node(
         package="bipedbot_controller",
         executable="simple_controller.py",
@@ -44,5 +50,6 @@ def generate_launch_description():
         wheel_separation_arg,
         joint_state_broadcaster_spawner,
         wheel_controller_spawner,
+        leg_controller_spawner,
         simple_controller,
     ])

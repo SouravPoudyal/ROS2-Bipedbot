@@ -9,8 +9,26 @@ controller_manager:
     simple_velocity_controller:
       type: velocity_controllers/JointGroupVelocityController
 
+    leg_position_controller:
+      type: position_controllers/JointGroupPositionController
+
 simple_velocity_controller:
   ros__parameters:
     joints:            # order must be [left, right] (see simple_controller.py)
       - left_wheel_joint
       - right_wheel_joint
+
+leg_position_controller:
+  ros__parameters:
+    joints:            # order [left_hip, left_knee, right_hip, right_knee] (see leg_height_controller.py)
+      - left_top_leg_joint
+      - left_bottom_leg_joint
+      - right_top_leg_joint
+      - right_bottom_leg_joint
+
+# Optional: a stiffer leg position servo. ign_ros2_control's default gain is 0.1, i.e. a
+# time constant of 1/(0.1 * update_rate) = 0.1 s at 100 Hz. Check the simulation log for
+# "position_proportional_gain parameter was not defined" to see whether this section is read.
+# gz_ros2_control:
+#   ros__parameters:
+#     position_proportional_gain: 0.2
